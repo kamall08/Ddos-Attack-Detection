@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Intel | Log Defender</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="dark-theme dashboard-page">
+    <nav class="navbar">
+        <div class="logo">
+            <span class="icon">🛡️</span>
+            <h1>Log Defender</h1>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('ip_analysis') }}" class="nav-link">IP Analysis</a>
+            <a href="{{ url_for('report') }}" class="nav-link">Traffic Report</a>
+            <a href="{{ url_for('threat_intel') }}" class="nav-link active">Threat Intel</a>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <header class="dashboard-header">
+            <h2>Threat Intelligence</h2>
+            <p>Analyze suspicious and malicious IPs by checking them against global threat databases.</p>
+        </header>
+
+        <section class="table-section card full-width">
+            <h3>Potential Threats from Logs</h3>
+            <div class="table-container">
+                {% if threat_ips %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>IP Address</th>
+                            <th>Request Count</th>
+                            <th>Internal Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in threat_ips %}
+                        <tr
+                            class="{% if item.status == 'Malicious' %}row-malicious{% elif item.status == 'Suspicious' %}row-suspicious{% endif %}">
+                            <td class="ip-cell">{{ item.ip }}</td>
+                            <td><strong>{{ item.count }}</strong></td>
+                            <td>
+                                {% if item.status == 'Malicious' %}
+                                <span class="tag malicious">Malicious</span>
+                                {% elif item.status == 'Suspicious' %}
+                                <span class="tag warning">Suspicious</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="https://www.abuseipdb.com/check/{{ item.ip }}" target="_blank"
+                                    class="btn secondary-btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                                    Lookup on AbuseIPDB ↗
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+                    <p>No threats detected! Your server traffic is clean.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

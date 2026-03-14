@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Log Defender</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="dark-theme dashboard-page">
+    <nav class="navbar">
+        <div class="logo">
+            <span class="icon">🛡️</span>
+            <h1>Log Defender</h1>
+        </div>
+        <a href="{{ url_for('index') }}" class="nav-link">Back to Upload</a>
+    </nav>
+
+    <main class="dashboard-container">
+        <header class="dashboard-header">
+            <h2>Security Overview</h2>
+            {% if results.is_under_attack %}
+            <div class="status-badge critical pulse">
+                🚨 POTENTIAL DDoS DETECTED
+            </div>
+            {% else %}
+            <div class="status-badge secure">
+                ✅ TRAFFIC NORMAL
+            </div>
+            {% endif %}
+        </header>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Requests</h3>
+                <div class="stat-value">{{ results.total_requests }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Unique IPs</h3>
+                <div class="stat-value">{{ results.unique_ips }}</div>
+            </div>
+            <div class="stat-card {{ 'alert-card' if results.suspicious_ips|length > 0 else '' }}">
+                <h3>Suspicious IPs</h3>
+                <div class="stat-value">{{ results.suspicious_ips|length }}</div>
+            </div>
+        </section>
+
+        <div class="main-content-grid">
+            <section class="chart-section card">
+                <h3>Top Request Sources</h3>
+                <div class="chart-container">
+                    <canvas id="trafficChart"></canvas>
+                </div>
+            </section>
+
+            <section class="table-section card">
+                <h3>Detected Suspicious Activity (Threshold > 100)</h3>
+                <div class="table-container">
+                    {% if results.suspicious_ips %}
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>IP Address</th>
+                                <th>Request Count</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in results.suspicious_ips %}
+                            <tr>
+                                <td class="ip-cell">{{ item.ip }}</td>
+                                <td><strong>{{ item.count }}</strong></td>
+                                <td><span class="tag malicious">Malicious</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="empty-state">
+                        <p>No suspicious IP addresses found. Traffic looks normal.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Pass chart data to JS safely -->
+    <script id="chart-data" type="application/json">
+        {{ results.chart_data | tojson | safe }}
+    </script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+
+</html>

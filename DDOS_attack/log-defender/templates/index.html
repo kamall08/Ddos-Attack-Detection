@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Defender | DDoS Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- Optional for icons -->
+</head>
+
+<body class="dark-theme">
+    <nav class="navbar">
+        <div class="logo">
+            <span class="icon">🛡️</span>
+            <h1>Log Defender</h1>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}" class="nav-link active">Home</a>
+            <a href="{{ url_for('ip_analysis') }}" class="nav-link">IP Analysis</a>
+            <a href="{{ url_for('report') }}" class="nav-link">Traffic Report</a>
+            <a href="{{ url_for('threat_intel') }}" class="nav-link">Threat Intel</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero">
+            <h2>DDoS Attack Detection System</h2>
+            <p>Analyze server logs instantly to detect anomalous traffic, identify malicious IP addresses, and secure
+                your infrastructure.</p>
+        </section>
+
+        <section class="upload-section card">
+            <h3>Analyze Log File</h3>
+            {% if error %}
+            <div class="alert error">{{ error }}</div>
+            {% endif %}
+
+            <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="upload-form">
+                <div class="file-input-wrapper">
+                    <label for="file" class="file-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Select a server log file (.txt, .log)</span>
+                    </label>
+                    <input type="file" id="file" name="file" accept=".txt,.log" required>
+                </div>
+                <button type="submit" class="btn primary-btn">Analyze Logs</button>
+            </form>
+
+            <div class="divider"><span>OR</span></div>
+
+            <div class="demo-section">
+                <p>Don't have a log file handy? Try the simulated attack scenario.</p>
+                <a href="{{ url_for('analyze_demo') }}" class="btn secondary-btn">Run Simulated Attack Demo</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Log Defender &copy; 2026</p>
+    </footer>
+</body>
+
+</html>
